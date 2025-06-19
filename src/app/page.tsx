@@ -12,6 +12,13 @@ import { cn } from "@/lib/utils";
 import { ThemeToggleButton } from "@/components/theme-toggle-button";
 import { ComparisonChart } from "@/components/comparison-chart";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 
 export interface Settings {
@@ -102,6 +109,18 @@ const initialTestimonialData: Testimonial[] = [
     author: "Alice Brown",
     title: "Founder, Creative Co.",
     rating: 4,
+  },
+  {
+    quote: "Customer support is top-notch! They are always ready to help with any query.",
+    author: "Michael Lee",
+    title: "Manager, Biz Dynamics",
+    rating: 5,
+  },
+  {
+    quote: "The consolidation feature alone is worth the price. It's made our month-end closing so much smoother.",
+    author: "Sarah Wilson",
+    title: "Accountant, Numbers Pro",
+    rating: 5,
   }
 ];
 
@@ -312,7 +331,6 @@ export default function HomePage() {
         </div>
 
         <AnimatedSection id="services" className="bg-background/30 relative">
-            {/* Removed parallax div, global decorative elements will show through */}
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
                 <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-primary">Our Services</h2>
                 <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
@@ -373,33 +391,46 @@ export default function HomePage() {
             </div>
         </AnimatedSection>
 
-        <AnimatedSection id="testimonials">
+       <AnimatedSection id="testimonials">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-primary">What Our Clients Say</h2>
             <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
               Hear directly from businesses that have transformed their financial operations with Insightful.
             </p>
-            <div className="grid md:grid-cols-3 gap-8">
-              {initialTestimonialData.map((testimonial, index) => (
-                <Card key={index} className="bg-card p-6 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1 flex flex-col">
-                  <CardContent className="flex flex-col items-center text-center flex-grow pt-6"> {/* Added pt-6 to CardContent */}
-                    {/* Image component removed */}
-                    <Quote className="w-8 h-8 text-primary mb-4 opacity-75 transform -scale-x-100" />
-                    <p className="text-muted-foreground italic mb-4 text-sm leading-relaxed flex-grow">"{testimonial.quote}"</p>
-                    <div className="flex items-center mb-2 mt-auto">
-                      {Array(testimonial.rating).fill(0).map((_, i) => (
-                        <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-                      ))}
-                       {Array(5 - testimonial.rating).fill(0).map((_, i) => (
-                        <Star key={`empty-${i}`} className="w-5 h-5 text-gray-300 dark:text-gray-600" />
-                      ))}
+            <Carousel
+              opts={{
+                align: "start",
+                loop: true,
+              }}
+              className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-2xl xl:max-w-4xl mx-auto"
+            >
+              <CarouselContent>
+                {initialTestimonialData.map((testimonial, index) => (
+                  <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3 p-2">
+                    <div className="p-1 h-full">
+                      <Card className="bg-card p-6 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1 flex flex-col h-full">
+                        <CardContent className="flex flex-col items-center text-center flex-grow pt-6">
+                          <Quote className="w-8 h-8 text-primary mb-4 opacity-75 transform -scale-x-100" />
+                          <p className="text-muted-foreground italic mb-4 text-sm leading-relaxed flex-grow">"{testimonial.quote}"</p>
+                          <div className="flex items-center mb-2 mt-auto">
+                            {Array(testimonial.rating).fill(0).map((_, i) => (
+                              <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                            ))}
+                            {Array(5 - testimonial.rating).fill(0).map((_, i) => (
+                              <Star key={`empty-${i}`} className="w-5 h-5 text-gray-300 dark:text-gray-600" />
+                            ))}
+                          </div>
+                          <h4 className="font-semibold text-card-foreground mt-2">{testimonial.author}</h4>
+                          <p className="text-xs text-muted-foreground">{testimonial.title}</p>
+                        </CardContent>
+                      </Card>
                     </div>
-                    <h4 className="font-semibold text-card-foreground mt-2">{testimonial.author}</h4>
-                    <p className="text-xs text-muted-foreground">{testimonial.title}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="left-[-1rem] sm:left-[-2rem] md:left-[-3rem]" />
+              <CarouselNext className="right-[-1rem] sm:right-[-2rem] md:right-[-3rem]" />
+            </Carousel>
           </div>
         </AnimatedSection>
 
