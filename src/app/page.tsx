@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils";
 import { ThemeToggleButton } from "@/components/theme-toggle-button";
 import { ComparisonChart } from "@/components/comparison-chart";
 import { Card, CardContent } from "@/components/ui/card";
-import { generateTestimonialImage, type GenerateTestimonialImageOutput } from '@/ai/flows/generate-testimonial-image-flow';
 
 
 export interface Settings {
@@ -82,9 +81,7 @@ interface Testimonial {
   quote: string;
   author: string;
   title: string;
-  avatar: string; // Will hold placeholder or AI-generated image URI
   rating: number;
-  dataAiHint: string; // Used as prompt for AI image generation
 }
 
 const initialTestimonialData: Testimonial[] = [
@@ -92,25 +89,19 @@ const initialTestimonialData: Testimonial[] = [
     quote: "Insightful has revolutionized how we handle our finances. The AI-powered reports are a game-changer!",
     author: "Jane Doe",
     title: "CEO, Tech Solutions Inc.",
-    avatar: "https://placehold.co/80x80.png", // Initial placeholder
     rating: 5,
-    dataAiHint: "female executive"
   },
   {
     quote: "The accuracy of their forecasting tools is unmatched. We've saved countless hours and resources.",
     author: "John Smith",
     title: "CFO, Global Corp",
-    avatar: "https://placehold.co/80x80.png", // Initial placeholder
     rating: 5,
-    dataAiHint: "male professional"
   },
   {
     quote: "Finally, a financial platform that understands our needs. The dashboards are intuitive and powerful.",
     author: "Alice Brown",
     title: "Founder, Creative Co.",
-    avatar: "https://placehold.co/80x80.png", // Initial placeholder
     rating: 4,
-    dataAiHint: "startup founder"
   }
 ];
 
@@ -164,7 +155,6 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('home');
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [currentTestimonials, setCurrentTestimonials] = useState<Testimonial[]>(initialTestimonialData);
 
  useEffect(() => {
     setCurrentYear(new Date().getFullYear());
@@ -172,22 +162,6 @@ export default function HomePage() {
       setIsLoading(false);
     }, 2500);
 
-    const fetchTestimonialImages = async () => {
-      const updatedTestimonials = await Promise.all(
-        initialTestimonialData.map(async (testimonial) => {
-          try {
-            const result: GenerateTestimonialImageOutput = await generateTestimonialImage({ hint: testimonial.dataAiHint });
-            return { ...testimonial, avatar: result.imageDataUri };
-          } catch (error) {
-            console.error(`Failed to generate image for ${testimonial.author}:`, error);
-            return testimonial; // Keep placeholder on error
-          }
-        })
-      );
-      setCurrentTestimonials(updatedTestimonials);
-    };
-
-    fetchTestimonialImages();
     return () => clearTimeout(timer);
   }, []);
 
@@ -338,7 +312,7 @@ export default function HomePage() {
         </div>
 
         <AnimatedSection id="services" className="bg-background/30 relative">
-            <div className="absolute inset-0 parallax-bg opacity-40" style={{backgroundImage: "url('https://placehold.co/1200x800.png')"}} data-ai-hint='abstract lines'></div>
+            {/* Removed parallax div, global decorative elements will show through */}
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
                 <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-primary">Our Services</h2>
                 <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
@@ -406,10 +380,10 @@ export default function HomePage() {
               Hear directly from businesses that have transformed their financial operations with Insightful.
             </p>
             <div className="grid md:grid-cols-3 gap-8">
-              {currentTestimonials.map((testimonial, index) => (
+              {initialTestimonialData.map((testimonial, index) => (
                 <Card key={index} className="bg-card p-6 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1 flex flex-col">
-                  <CardContent className="flex flex-col items-center text-center flex-grow">
-                    <Image src={testimonial.avatar} alt={`Avatar of ${testimonial.author}`} width={80} height={80} className="rounded-full mb-4 object-cover" />
+                  <CardContent className="flex flex-col items-center text-center flex-grow pt-6"> {/* Added pt-6 to CardContent */}
+                    {/* Image component removed */}
                     <Quote className="w-8 h-8 text-primary mb-4 opacity-75 transform -scale-x-100" />
                     <p className="text-muted-foreground italic mb-4 text-sm leading-relaxed flex-grow">"{testimonial.quote}"</p>
                     <div className="flex items-center mb-2 mt-auto">
