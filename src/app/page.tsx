@@ -447,7 +447,7 @@ export default function HomePage() {
         </AnimatedSection>
 
         <footer className="py-8 text-center text-sm text-muted-foreground border-t border-border mt-auto z-10">
-          <p>&copy; {currentYear || new Date().getFullYear()} Insightful AI Tools Inc. All rights reserved.</p>
+          <p>&copy; {currentYear || new Date().getFullYear()} Insightful AI Tools Inc. All rights reserved. Made by Ansuj K Meher</p>
         </footer>
 
         {showScrollTop && (
