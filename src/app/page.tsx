@@ -6,11 +6,13 @@ import Image from "next/image";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { HighlightedKeyword } from "@/components/highlighted-keyword";
 import { Button } from "@/components/ui/button";
-import { Star, Briefcase, TrendingUp, PieChart, BarChart2, Zap, Mail, ChevronUp, CheckCircle2, XCircle } from "lucide-react";
+import { Star, Briefcase, TrendingUp, PieChart, BarChart2, Zap, Mail, ChevronUp, CheckCircle2, XCircle, Quote } from "lucide-react";
 import { AppLoader } from "@/components/loader";
 import { cn } from "@/lib/utils";
 import { ThemeToggleButton } from "@/components/theme-toggle-button";
-import { ComparisonChart } from "@/components/comparison-chart"; // New import
+import { ComparisonChart } from "@/components/comparison-chart"; 
+import { Card, CardContent } from "@/components/ui/card";
+
 
 export interface Settings {
   hoverDelay: number;
@@ -70,8 +72,36 @@ const navLinks = [
   { name: "Home", href: "#home" },
   { name: "Services", href: "#services" },
   { name: "Features", href: "#features" },
-  { name: "Why Us?", href: "#why-us" }, // New nav link
+  { name: "Why Us?", href: "#why-us" },
+  { name: "Testimonials", href: "#testimonials" },
   { name: "Contact", href: "#contact" },
+];
+
+const testimonialData = [
+  {
+    quote: "Insightful has revolutionized how we handle our finances. The AI-powered reports are a game-changer!",
+    author: "Jane Doe",
+    title: "CEO, Tech Solutions Inc.",
+    avatar: "https://placehold.co/80x80.png",
+    rating: 5,
+    dataAiHint: "female executive"
+  },
+  {
+    quote: "The accuracy of their forecasting tools is unmatched. We've saved countless hours and resources.",
+    author: "John Smith",
+    title: "CFO, Global Corp",
+    avatar: "https://placehold.co/80x80.png",
+    rating: 5,
+    dataAiHint: "male professional"
+  },
+  {
+    quote: "Finally, a financial platform that understands our needs. The dashboards are intuitive and powerful.",
+    author: "Alice Brown",
+    title: "Founder, Creative Co.",
+    avatar: "https://placehold.co/80x80.png",
+    rating: 4,
+    dataAiHint: "startup founder"
+  }
 ];
 
 const AnimatedSection = ({ id, children, className }: { id: string, children: React.ReactNode, className?: string }) => {
@@ -134,7 +164,7 @@ export default function HomePage() {
   }, []);
 
   const handleScroll = useCallback(() => {
-    const sections = navLinks.map(link => link.href.substring(1)); // Use navLinks for sections
+    const sections = navLinks.map(link => link.href.substring(1)); 
     const scrollPosition = window.scrollY + window.innerHeight / 2;
 
     for (const sectionId of sections) {
@@ -339,6 +369,36 @@ export default function HomePage() {
                 </p>
                 <ComparisonChart />
             </div>
+        </AnimatedSection>
+
+        <AnimatedSection id="testimonials">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-primary">What Our Clients Say</h2>
+            <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
+              Hear directly from businesses that have transformed their financial operations with Insightful.
+            </p>
+            <div className="grid md:grid-cols-3 gap-8">
+              {testimonialData.map((testimonial, index) => (
+                <Card key={index} className="bg-card p-6 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1 flex flex-col">
+                  <CardContent className="flex flex-col items-center text-center flex-grow">
+                    <Image src={testimonial.avatar} alt={`Avatar of ${testimonial.author}`} width={80} height={80} className="rounded-full mb-4 object-cover" data-ai-hint={testimonial.dataAiHint}/>
+                    <Quote className="w-8 h-8 text-primary mb-4 opacity-75 transform -scale-x-100" />
+                    <p className="text-muted-foreground italic mb-4 text-sm leading-relaxed flex-grow">"{testimonial.quote}"</p>
+                    <div className="flex items-center mb-2 mt-auto">
+                      {Array(testimonial.rating).fill(0).map((_, i) => (
+                        <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                      ))}
+                       {Array(5 - testimonial.rating).fill(0).map((_, i) => (
+                        <Star key={`empty-${i}`} className="w-5 h-5 text-gray-300 dark:text-gray-600" />
+                      ))}
+                    </div>
+                    <h4 className="font-semibold text-card-foreground mt-2">{testimonial.author}</h4>
+                    <p className="text-xs text-muted-foreground">{testimonial.title}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
         </AnimatedSection>
 
         <AnimatedSection id="contact" className="bg-background/30">
