@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -102,5 +103,34 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    scroll-behavior: smooth; /* For smooth scrolling from nav links */
   }
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Ripple effect for navigation links */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3); /* Light ripple on dark background */
+  transform: scale(0);
+  animation: ripple-animation 0.6s linear;
+  pointer-events: none; /* Ensure ripple doesn't interfere with clicks */
+}
+
+@keyframes ripple-animation {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Parallax-like effect for background images */
+.parallax-bg {
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }

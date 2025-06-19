@@ -1,13 +1,14 @@
 
 "use client";
 
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { HighlightedKeyword } from "@/components/highlighted-keyword";
 import { Button } from "@/components/ui/button";
-import { Star, Briefcase, TrendingUp, PieChart } from "lucide-react";
+import { Star, Briefcase, TrendingUp, PieChart, BarChart2, Zap, Mail, ChevronUp } from "lucide-react";
 import { AppLoader } from "@/components/loader";
+import { cn } from "@/lib/utils";
 
 export interface Settings {
   hoverDelay: number;
@@ -63,18 +64,91 @@ const ratings = [
   { name: "QuickBooks", rating: "550+", reviews: "reviews on", icon: <PieChart className="w-4 h-4 text-green-400" /> },
 ];
 
+const navLinks = [
+  { name: "Home", href: "#home" },
+  { name: "Services", href: "#services" },
+  { name: "Features", href: "#features" },
+  { name: "Contact", href: "#contact" },
+];
+
+const AnimatedSection = ({ id, children, className }: { id: string, children: React.ReactNode, className?: string }) => {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <section
+      id={id}
+      ref={sectionRef}
+      className={cn(
+        "py-16 md:py-24 min-h-[60vh] transition-all duration-1000 ease-out",
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10",
+        className
+      )}
+    >
+      {children}
+    </section>
+  );
+};
+
+
 export default function HomePage() {
   const [settings, setSettings] = useState<Settings>(initialSettings);
   const [currentYear, setCurrentYear] = useState<number | string>('');
   const [isLoading, setIsLoading] = useState(true);
+  const [activeSection, setActiveSection] = useState('home');
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
-    setCurrentYear(new Date().getFullYear());
+    const year = new Date().getFullYear();
+    setCurrentYear(year);
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 2500); // Simulate loading for 2.5 seconds
+    }, 2500); 
     return () => clearTimeout(timer);
   }, []);
+
+  const handleScroll = useCallback(() => {
+    const sections = ['home', 'services', 'features', 'contact'];
+    const scrollPosition = window.scrollY + window.innerHeight / 2;
+
+    for (const sectionId of sections) {
+      const element = document.getElementById(sectionId);
+      if (element && element.offsetTop <= scrollPosition && element.offsetTop + element.offsetHeight > scrollPosition) {
+        setActiveSection(sectionId);
+        break;
+      }
+    }
+    setShowScrollTop(window.scrollY > 300);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
 
   const processedTitle = useMemo(() =>
     renderTextWithHighlights(
@@ -83,6 +157,29 @@ export default function HomePage() {
       HighlightedKeyword,
       settings
     ), [settings]);
+
+  const handleNavLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const targetElement = document.querySelector(href);
+    if (targetElement) {
+      targetElement.scrollIntoView({ behavior: 'smooth' });
+      // Add ripple effect
+      const link = e.currentTarget;
+      const ripple = document.createElement('span');
+      const rect = link.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      ripple.style.width = ripple.style.height = `${size}px`;
+      ripple.style.left = `${e.clientX - rect.left - size / 2}px`;
+      ripple.style.top = `${e.clientY - rect.top - size / 2}px`;
+      ripple.classList.add('ripple');
+      link.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+    }
+  };
+  
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   if (isLoading) {
     return <AppLoader />;
@@ -99,47 +196,155 @@ export default function HomePage() {
         <div className="absolute top-20 left-1/2 w-60 h-60 bg-teal-500/10 rounded-full blur-3xl opacity-30 animate-ping-slow pointer-events-none" data-ai-hint="dotted pattern"></div>
         <div className="absolute bottom-10 right-10 w-40 h-40 bg-pink-500/10 rounded-2xl blur-2xl opacity-40 transform rotate-45 animate-pulse-slow pointer-events-none" data-ai-hint="soft glow"></div>
 
-        <nav className="w-full py-5 px-4 sm:px-8 md:px-16 z-10">
-          <div className="container mx-auto flex flex-wrap justify-center items-center gap-x-6 lg:gap-x-10 gap-y-2 text-sm text-slate-300">
-            {ratings.map((item, index) => (
-              <div key={index} className="flex items-center space-x-1.5">
-                {item.icon}
-                <span><strong>{item.rating}</strong> {item.reviews} <span className="font-semibold text-slate-100">{item.name}</span></span>
+        <header className="fixed top-0 left-0 right-0 z-50 bg-[hsl(220,50%,12%)]/80 backdrop-blur-md shadow-lg">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <div className="flex items-center">
+                <a href="#home" onClick={(e) => handleNavLinkClick(e, "#home")} className="text-2xl font-bold text-primary">
+                  Insightful
+                </a>
               </div>
-            ))}
+              <nav className="hidden md:flex space-x-4">
+                {navLinks.map((link) => (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    onClick={(e) => handleNavLinkClick(e, link.href)}
+                    className={cn(
+                      "px-3 py-2 rounded-md text-sm font-medium relative overflow-hidden",
+                      activeSection === link.href.substring(1)
+                        ? "text-primary bg-primary/10"
+                        : "text-slate-300 hover:text-white hover:bg-white/5",
+                      "transition-colors duration-150"
+                    )}
+                  >
+                    {link.name}
+                  </a>
+                ))}
+              </nav>
+              {/* Mobile menu button could be added here */}
+            </div>
           </div>
-        </nav>
-
-        <main className="flex-grow flex flex-col items-center justify-center text-center px-4 py-10 sm:py-16 z-10">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">
-            {processedTitle}
-          </h1>
-          <p className="text-xl sm:text-2xl mb-10 text-slate-200 flex items-center">
-            <span role="img" aria-label="sparkles" className="mr-2 text-2xl">✨</span>
-            Now with AI-insights
-          </p>
-          <div className="flex flex-col sm:flex-row items-center gap-5">
-            <Button
-              size="lg"
-              className="px-8 py-3 text-base font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg transform transition-transform hover:scale-105"
-              aria-label="Start 14-day free trial"
-            >
-              Start 14-day free trial &gt;
-            </Button>
-            <Button
-              variant="link"
-              size="lg"
-              className="text-accent hover:text-accent/80 font-semibold text-base group"
-              aria-label="See what we do"
-            >
-              <Briefcase className="mr-2 h-5 w-5 transition-transform group-hover:rotate-[-5deg]" /> See what we do
-            </Button>
-          </div>
-        </main>
+        </header>
         
-         <footer className="py-6 text-center text-xs text-slate-400/70 border-t border-slate-200/10 mt-auto z-10">
+        <div id="home" className="pt-16"> {/* Add padding-top to offset fixed header */}
+          <div className="w-full py-5 px-4 sm:px-8 md:px-16 z-10">
+            <div className="container mx-auto flex flex-wrap justify-center items-center gap-x-6 lg:gap-x-10 gap-y-2 text-sm text-slate-300 mt-8">
+              {ratings.map((item, index) => (
+                <div key={index} className="flex items-center space-x-1.5">
+                  {item.icon}
+                  <span><strong>{item.rating}</strong> {item.reviews} <span className="font-semibold text-slate-100">{item.name}</span></span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <main className="flex-grow flex flex-col items-center justify-center text-center px-4 py-10 sm:py-16 z-10 min-h-[calc(100vh-4rem-5rem)]"> {/* Adjust min-height for header and ratings */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">
+              {processedTitle}
+            </h1>
+            <p className="text-xl sm:text-2xl mb-10 text-slate-200 flex items-center">
+              <span role="img" aria-label="sparkles" className="mr-2 text-2xl">✨</span>
+              Now with AI-insights
+            </p>
+            <div className="flex flex-col sm:flex-row items-center gap-5">
+              <Button
+                size="lg"
+                className="px-8 py-3 text-base font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg transform transition-transform hover:scale-105"
+                aria-label="Start 14-day free trial"
+              >
+                Start 14-day free trial &gt;
+              </Button>
+              <Button
+                variant="link"
+                size="lg"
+                className="text-accent hover:text-accent/80 font-semibold text-base group"
+                aria-label="See what we do"
+                onClick={(e) => handleNavLinkClick(e, "#services")}
+              >
+                <Briefcase className="mr-2 h-5 w-5 transition-transform group-hover:rotate-[-5deg]" /> See what we do
+              </Button>
+            </div>
+          </main>
+        </div>
+        
+        <AnimatedSection id="services" className="bg-gradient-to-b from-transparent to-[hsl(220,50%,18%)]/30 relative">
+            <div className="absolute inset-0 bg-[url('https://placehold.co/1200x800/1A202C/3A404C.png&text=Abstract+Lines')] bg-cover bg-fixed opacity-5 data-ai-hint='abstract lines'"></div>
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-primary">Our Services</h2>
+                <p className="text-lg text-slate-300 mb-12 max-w-2xl mx-auto">
+                    We offer a comprehensive suite of AI-powered financial tools to streamline your business operations.
+                </p>
+                <div className="grid md:grid-cols-3 gap-8">
+                    {[
+                        { title: "AI Reporting", icon: <BarChart2 className="w-10 h-10 text-accent mx-auto mb-4" />, desc: "Generate insightful financial reports automatically." , dataAiHint: "financial report"},
+                        { title: "Smart Forecasting", icon: <TrendingUp className="w-10 h-10 text-accent mx-auto mb-4" />, desc: "Predict future financial trends with high accuracy." , dataAiHint: "growth chart"},
+                        { title: "Automated Dashboards", icon: <PieChart className="w-10 h-10 text-accent mx-auto mb-4" />, desc: "Visualize your financial data in real-time dashboards." , dataAiHint: "data dashboard"},
+                    ].map((service, index) => (
+                        <div key={index} className="bg-card p-6 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1">
+                            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center" data-ai-hint={service.dataAiHint}>
+                               {service.icon}
+                            </div>
+                            <h3 className="text-xl font-semibold mb-2 text-foreground">{service.title}</h3>
+                            <p className="text-muted-foreground text-sm">{service.desc}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </AnimatedSection>
+
+        <AnimatedSection id="features">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-primary">Key Features</h2>
+                <p className="text-lg text-slate-300 mb-12 max-w-2xl mx-auto">
+                    Discover the powerful features that make our platform stand out.
+                </p>
+                <div className="grid md:grid-cols-2 gap-8">
+                     {[
+                        { title: "Real-time Consolidation", icon: <Zap className="w-8 h-8 text-accent" />, desc: "Consolidate data from multiple sources instantly." , dataAiHint: "connected data"},
+                        { title: "Advanced AI Insights", icon: <Star className="w-8 h-8 text-accent" />, desc: "Leverage cutting-edge AI for deeper financial understanding." , dataAiHint: "brain gears"},
+                        { title: "Secure & Reliable", icon: <Briefcase className="w-8 h-8 text-accent" />, desc: "Bank-level security to protect your sensitive data." , dataAiHint: "secure lock"},
+                        { title: "Easy Integration", icon: <PieChart className="w-8 h-8 text-accent" />, desc: "Seamlessly connect with your existing financial software." , dataAiHint: "puzzle pieces"},
+                    ].map((feature, index) => (
+                         <div key={index} className="bg-card p-8 rounded-xl shadow-xl flex items-start space-x-4 hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1">
+                            <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center" data-ai-hint={feature.dataAiHint}>
+                                {feature.icon}
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-semibold mb-1 text-foreground text-left">{feature.title}</h3>
+                                <p className="text-muted-foreground text-sm text-left">{feature.desc}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </AnimatedSection>
+
+        <AnimatedSection id="contact" className="bg-gradient-to-t from-transparent to-[hsl(220,50%,18%)]/30">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-primary">Get in Touch</h2>
+                <p className="text-lg text-slate-300 mb-10 max-w-xl mx-auto">
+                    Have questions or want to learn more? Reach out to us!
+                </p>
+                <Button size="lg" className="px-10 py-4 text-lg font-semibold rounded-lg bg-accent text-accent-foreground hover:bg-accent/90 shadow-lg transform transition-transform hover:scale-105">
+                    <Mail className="mr-2 h-5 w-5" /> Contact Sales
+                </Button>
+            </div>
+        </AnimatedSection>
+         
+        <footer className="py-8 text-center text-sm text-slate-400/70 border-t border-slate-200/10 mt-auto z-10">
           <p>&copy; {currentYear || new Date().getFullYear()} AI Financial Tools Inc. All rights reserved.</p>
         </footer>
+
+        {showScrollTop && (
+          <Button
+            onClick={scrollToTop}
+            className="fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full p-0 shadow-lg bg-primary hover:bg-primary/90"
+            aria-label="Scroll to top"
+          >
+            <ChevronUp className="h-6 w-6" />
+          </Button>
+        )}
       </div>
     </TooltipProvider>
   );
