@@ -3,13 +3,14 @@
 @tailwind utilities;
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', sans-serif; /* Ensure Inter is primary */
 }
 
 @layer base {
   :root {
-    --background: 210 27% 95%; /* #F0F4F8 Light Gray */
-    --foreground: 210 10% 23%; /* Dark Gray for text */
+    /* Light theme (will not be default, but kept for completeness) */
+    --background: 210 27% 95%; 
+    --foreground: 210 10% 23%;
 
     --card: 210 27% 98%;
     --card-foreground: var(--foreground);
@@ -17,8 +18,8 @@ body {
     --popover: 210 27% 98%;
     --popover-foreground: var(--foreground);
 
-    --primary: 207 87% 68%; /* #64B5F6 Soft Blue */
-    --primary-foreground: 210 40% 10%; /* Dark color for text on primary */
+    --primary: 207 87% 68%; 
+    --primary-foreground: 210 40% 10%;
 
     --secondary: 210 25% 90%;
     --secondary-foreground: 210 10% 23%;
@@ -26,15 +27,15 @@ body {
     --muted: 210 25% 85%;
     --muted-foreground: 210 10% 45%;
 
-    --accent: 288 39% 59%; /* #BA68C8 Vibrant Purple */
-    --accent-foreground: 0 0% 98%; /* White/very light for text on accent */
+    --accent: 288 39% 59%; 
+    --accent-foreground: 0 0% 98%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 210 20% 88%;
     --input: 210 20% 92%;
-    --ring: 207 87% 60%; /* Ring color related to primary */
+    --ring: 207 87% 60%;
 
     --radius: 0.5rem;
 
@@ -44,9 +45,7 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
 
-    /* Sidebar variables - retain or adjust as needed if sidebar is used extensively elsewhere */
-    /* For this app, sidebar might not be the main component, but good to keep them consistent */
-    --sidebar-background: 210 27% 92%; /* Slightly darker than main bg */
+    --sidebar-background: 210 27% 92%;
     --sidebar-foreground: 210 10% 23%;
     --sidebar-primary: var(--primary);
     --sidebar-primary-foreground: var(--primary-foreground);
@@ -57,42 +56,42 @@ body {
   }
 
   .dark {
-    --background: 210 10% 15%; /* Dark bluish gray */
-    --foreground: 210 20% 90%; /* Light gray text */
+    /* Dark theme based on the new design */
+    --background: 220 50% 12%; /* Dark Navy Blue base */
+    --foreground: 0 0% 98%; /* Almost White text */
 
-    --card: 210 10% 20%;
+    --card: 220 40% 18%; /* Slightly lighter navy for cards */
     --card-foreground: var(--foreground);
 
-    --popover: 210 10% 20%;
+    --popover: 220 40% 18%;
     --popover-foreground: var(--foreground);
 
-    --primary: 207 70% 55%; /* Darker soft blue */
-    --primary-foreground: 210 30% 95%; /* Light text on primary */
+    --primary: 195 77% 75%; /* Light Sky Blue for buttons */
+    --primary-foreground: 220 50% 12%; /* Dark Navy text on light blue buttons */
 
-    --secondary: 210 10% 25%;
+    --secondary: 220 30% 25%;
     --secondary-foreground: var(--foreground);
 
-    --muted: 210 10% 30%;
-    --muted-foreground: 210 20% 70%;
+    --muted: 220 20% 30%;
+    --muted-foreground: 210 20% 75%; /* Lighter gray for muted text */
 
-    --accent: 288 50% 70%; /* Lighter vibrant purple */
-    --accent-foreground: 288 20% 10%; /* Dark text on accent */
+    --accent: 200 100% 90%; /* Very Light Blue/Almost White for accents/links */
+    --accent-foreground: 220 50% 12%; /* Dark Navy text on accent */
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 70% 50%; /* Adjusted red for dark theme */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 210 10% 30%;
-    --input: 210 10% 25%;
-    --ring: 207 70% 50%;
+    --border: 220 30% 30%;
+    --input: 220 30% 25%;
+    --ring: 195 77% 65%; /* Ring color related to primary */
 
-    /* Dark Sidebar variables */
-    --sidebar-background: 210 10% 12%;
-    --sidebar-foreground: 210 20% 88%;
+    --sidebar-background: 220 50% 10%;
+    --sidebar-foreground: 0 0% 95%;
     --sidebar-primary: var(--primary);
     --sidebar-primary-foreground: var(--primary-foreground);
     --sidebar-accent: var(--accent);
     --sidebar-accent-foreground: var(--accent-foreground);
-    --sidebar-border: 210 10% 28%;
+    --sidebar-border: 220 30% 28%;
     --sidebar-ring: var(--ring);
   }
 }
