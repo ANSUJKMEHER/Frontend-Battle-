@@ -8,19 +8,17 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { HoverCardContent } from "./hover-card-content";
-import type { Settings } from '@/app/page'; 
+import type { Settings } from '@/app/page';
 
 interface HighlightedKeywordProps {
   keyword: string;
   children: React.ReactNode;
-  fullText: string;
   settings: Settings;
 }
 
 export function HighlightedKeyword({
   keyword,
   children,
-  fullText,
   settings,
 }: HighlightedKeywordProps) {
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
@@ -39,10 +37,9 @@ export function HighlightedKeyword({
       <TooltipContent
         side="top"
         align="center"
-        className="p-0 bg-transparent border-none shadow-none max-w-xs w-auto"
+        className="p-0 bg-transparent border-none shadow-none max-w-xs"
       >
-        {/* HoverCardContent handles its own visibility based on isTooltipOpen */}
-        <HoverCardContent keyword={keyword} fullText={fullText} isVisible={isTooltipOpen} />
+        <HoverCardContent keyword={keyword} isVisible={isTooltipOpen} />
       </TooltipContent>
     </Tooltip>
   );
