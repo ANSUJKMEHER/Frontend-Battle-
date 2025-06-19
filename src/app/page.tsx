@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { HighlightedKeyword } from "@/components/highlighted-keyword";
 import { Button } from "@/components/ui/button";
 import { Star, Briefcase, TrendingUp, PieChart } from "lucide-react";
+import { AppLoader } from "@/components/loader";
 
 export interface Settings {
   hoverDelay: number;
@@ -21,7 +22,6 @@ const initialSettings: Settings = {
 const mainTextContent = "Create reports, forecasts, dashboards & consolidations";
 const keywordsToHighlight = ["reports", "forecasts", "dashboards", "consolidations"];
 
-// Helper for rendering text with highlighted keywords
 const renderTextWithHighlights = (
   text: string,
   keywords: string[],
@@ -56,7 +56,6 @@ const renderTextWithHighlights = (
   });
 };
 
-// Ratings data
 const ratings = [
   { name: "Capterra", rating: "4.8", reviews: "rating on", icon: <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" /> },
   { name: "G2", rating: "4.8", reviews: "rating on", icon: <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" /> },
@@ -67,9 +66,14 @@ const ratings = [
 export default function HomePage() {
   const [settings, setSettings] = useState<Settings>(initialSettings);
   const [currentYear, setCurrentYear] = useState<number | string>('');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setCurrentYear(new Date().getFullYear());
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2500); // Simulate loading for 2.5 seconds
+    return () => clearTimeout(timer);
   }, []);
 
   const processedTitle = useMemo(() =>
@@ -79,6 +83,10 @@ export default function HomePage() {
       HighlightedKeyword,
       settings
     ), [settings]);
+
+  if (isLoading) {
+    return <AppLoader />;
+  }
 
   return (
     <TooltipProvider key={settings.hoverDelay} delayDuration={settings.hoverDelay}>
@@ -136,4 +144,3 @@ export default function HomePage() {
     </TooltipProvider>
   );
 }
-
