@@ -6,12 +6,13 @@ import Image from "next/image";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { HighlightedKeyword } from "@/components/highlighted-keyword";
 import { Button } from "@/components/ui/button";
-import { Star, Briefcase, TrendingUp, PieChart, BarChart2, Zap, Mail, ChevronUp, CheckCircle2, XCircle, Quote } from "lucide-react";
+import { Star, Briefcase, TrendingUp, PieChart, BarChart2, Zap, Mail, ChevronUp, Quote } from "lucide-react";
 import { AppLoader } from "@/components/loader";
 import { cn } from "@/lib/utils";
 import { ThemeToggleButton } from "@/components/theme-toggle-button";
-import { ComparisonChart } from "@/components/comparison-chart"; 
+import { ComparisonChart } from "@/components/comparison-chart";
 import { Card, CardContent } from "@/components/ui/card";
+import { generateTestimonialImage, type GenerateTestimonialImageOutput } from '@/ai/flows/generate-testimonial-image-flow';
 
 
 export interface Settings {
@@ -77,12 +78,21 @@ const navLinks = [
   { name: "Contact", href: "#contact" },
 ];
 
-const testimonialData = [
+interface Testimonial {
+  quote: string;
+  author: string;
+  title: string;
+  avatar: string; // Will hold placeholder or AI-generated image URI
+  rating: number;
+  dataAiHint: string; // Used as prompt for AI image generation
+}
+
+const initialTestimonialData: Testimonial[] = [
   {
     quote: "Insightful has revolutionized how we handle our finances. The AI-powered reports are a game-changer!",
     author: "Jane Doe",
     title: "CEO, Tech Solutions Inc.",
-    avatar: "https://placehold.co/80x80.png",
+    avatar: "https://placehold.co/80x80.png", // Initial placeholder
     rating: 5,
     dataAiHint: "female executive"
   },
@@ -90,7 +100,7 @@ const testimonialData = [
     quote: "The accuracy of their forecasting tools is unmatched. We've saved countless hours and resources.",
     author: "John Smith",
     title: "CFO, Global Corp",
-    avatar: "https://placehold.co/80x80.png",
+    avatar: "https://placehold.co/80x80.png", // Initial placeholder
     rating: 5,
     dataAiHint: "male professional"
   },
@@ -98,7 +108,7 @@ const testimonialData = [
     quote: "Finally, a financial platform that understands our needs. The dashboards are intuitive and powerful.",
     author: "Alice Brown",
     title: "Founder, Creative Co.",
-    avatar: "https://placehold.co/80x80.png",
+    avatar: "https://placehold.co/80x80.png", // Initial placeholder
     rating: 4,
     dataAiHint: "startup founder"
   }
@@ -154,17 +164,35 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('home');
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [currentTestimonials, setCurrentTestimonials] = useState<Testimonial[]>(initialTestimonialData);
 
  useEffect(() => {
     setCurrentYear(new Date().getFullYear());
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 2500); 
+    }, 2500);
+
+    const fetchTestimonialImages = async () => {
+      const updatedTestimonials = await Promise.all(
+        initialTestimonialData.map(async (testimonial) => {
+          try {
+            const result: GenerateTestimonialImageOutput = await generateTestimonialImage({ hint: testimonial.dataAiHint });
+            return { ...testimonial, avatar: result.imageDataUri };
+          } catch (error) {
+            console.error(`Failed to generate image for ${testimonial.author}:`, error);
+            return testimonial; // Keep placeholder on error
+          }
+        })
+      );
+      setCurrentTestimonials(updatedTestimonials);
+    };
+
+    fetchTestimonialImages();
     return () => clearTimeout(timer);
   }, []);
 
   const handleScroll = useCallback(() => {
-    const sections = navLinks.map(link => link.href.substring(1)); 
+    const sections = navLinks.map(link => link.href.substring(1));
     const scrollPosition = window.scrollY + window.innerHeight / 2;
 
     for (const sectionId of sections) {
@@ -195,7 +223,7 @@ export default function HomePage() {
     const targetElement = document.querySelector(href);
     if (targetElement) {
       targetElement.scrollIntoView({ behavior: 'smooth' });
-      
+
       const link = e.currentTarget;
       const existingRipple = link.querySelector('.ripple');
       if (existingRipple) {
@@ -213,7 +241,7 @@ export default function HomePage() {
       setTimeout(() => ripple.remove(), 700);
     }
   };
-  
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -225,7 +253,7 @@ export default function HomePage() {
   return (
     <TooltipProvider key={settings.hoverDelay.toString()} delayDuration={settings.hoverDelay}>
       <div className="flex flex-col min-h-screen bg-gradient-to-br from-background via-background to-background text-foreground relative overflow-hidden">
-        
+
         <Image src="https://placehold.co/400x300.png" alt="decorative background chart" data-ai-hint="financial chart" width={400} height={300} className="absolute top-1/4 left-[-50px] opacity-[0.07] blur-md transform -rotate-12 pointer-events-none" />
         <Image src="https://placehold.co/300x450.png" alt="decorative background report" data-ai-hint="data report" width={300} height={450} className="absolute top-10 right-[-80px] opacity-[0.07] blur-lg transform rotate-6 pointer-events-none" />
         <div className="absolute top-1/3 left-1/4 w-32 h-32 bg-primary/10 rounded-full blur-2xl opacity-30 animate-pulse pointer-events-none" data-ai-hint="abstract circle"></div>
@@ -267,8 +295,8 @@ export default function HomePage() {
             </div>
           </div>
         </header>
-        
-        <div id="home" className="pt-16"> 
+
+        <div id="home" className="pt-16">
           <div className="w-full py-5 px-4 sm:px-8 md:px-16 z-10">
             <div className="container mx-auto flex flex-wrap justify-center items-center gap-x-6 lg:gap-x-10 gap-y-2 text-sm text-foreground/80 mt-8">
               {ratings.map((item, index) => (
@@ -308,9 +336,9 @@ export default function HomePage() {
             </div>
           </main>
         </div>
-        
+
         <AnimatedSection id="services" className="bg-background/30 relative">
-            <div className="absolute inset-0 parallax-bg opacity-40" style={{backgroundImage: "url('https://placehold.co/1200x800.png?text=Parallax+Lines')"}} data-ai-hint='abstract lines'></div>
+            <div className="absolute inset-0 parallax-bg opacity-40" style={{backgroundImage: "url('https://placehold.co/1200x800.png')"}} data-ai-hint='abstract lines'></div>
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
                 <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-primary">Our Services</h2>
                 <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
@@ -378,10 +406,10 @@ export default function HomePage() {
               Hear directly from businesses that have transformed their financial operations with Insightful.
             </p>
             <div className="grid md:grid-cols-3 gap-8">
-              {testimonialData.map((testimonial, index) => (
+              {currentTestimonials.map((testimonial, index) => (
                 <Card key={index} className="bg-card p-6 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1 flex flex-col">
                   <CardContent className="flex flex-col items-center text-center flex-grow">
-                    <Image src={testimonial.avatar} alt={`Avatar of ${testimonial.author}`} width={80} height={80} className="rounded-full mb-4 object-cover" data-ai-hint={testimonial.dataAiHint}/>
+                    <Image src={testimonial.avatar} alt={`Avatar of ${testimonial.author}`} width={80} height={80} className="rounded-full mb-4 object-cover" />
                     <Quote className="w-8 h-8 text-primary mb-4 opacity-75 transform -scale-x-100" />
                     <p className="text-muted-foreground italic mb-4 text-sm leading-relaxed flex-grow">"{testimonial.quote}"</p>
                     <div className="flex items-center mb-2 mt-auto">
@@ -412,7 +440,7 @@ export default function HomePage() {
                 </Button>
             </div>
         </AnimatedSection>
-         
+
         <footer className="py-8 text-center text-sm text-muted-foreground border-t border-border mt-auto z-10">
           <p>&copy; {currentYear || new Date().getFullYear()} Insightful AI Tools Inc. All rights reserved.</p>
         </footer>
@@ -430,4 +458,3 @@ export default function HomePage() {
     </TooltipProvider>
   );
 }
-
