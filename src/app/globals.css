@@ -114,18 +114,37 @@ body {
 .ripple {
   position: absolute;
   border-radius: 50%;
-  background-color: hsla(var(--primary) / 0.5); /* More visible ripple */
+  background-color: hsla(var(--primary) / 0.5); 
   transform: scale(0);
-  animation: ripple-animation 0.7s linear; /* Slightly longer duration */
-  pointer-events: none; /* Ensure ripple doesn't interfere with clicks */
+  animation: ripple-animation 0.7s linear; 
+  pointer-events: none; 
 }
 
 @keyframes ripple-animation {
   to {
-    transform: scale(5); /* Larger scale */
+    transform: scale(5); 
     opacity: 0;
   }
 }
+
+/* Ripple effect for loader background */
+.loader-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background-color: hsla(var(--primary) / 0.6); /* Slightly more visible ripple */
+  transform: scale(0);
+  animation: ripple-animation-loader 0.8s linear; /* Specific animation for loader */
+  pointer-events: none;
+  z-index: 10; /* Ensure ripples are above the background image but below loader content */
+}
+
+@keyframes ripple-animation-loader {
+  to {
+    transform: scale(15); /* Larger scale for full-page effect */
+    opacity: 0;
+  }
+}
+
 
 /* Parallax-like effect for background images */
 .parallax-bg {
