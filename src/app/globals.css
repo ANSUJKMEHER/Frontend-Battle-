@@ -153,3 +153,48 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
 }
+
+.starry-loader-background {
+  background-color: #00001a; /* Very dark blue base */
+  background-image:
+    /* Stars - Layer 1 (small, dense, brighter) */
+    radial-gradient(rgba(255, 255, 255, 0.9) 0.5px, transparent 0.5px),
+    /* Stars - Layer 2 (medium, less dense, slightly dimmer) */
+    radial-gradient(rgba(255, 255, 255, 0.7) 1px, transparent 1px),
+    /* Nebula-like gradient */
+    radial-gradient(ellipse at 60% 40%, hsla(220, 100%, 65%, 0.3) 0%, transparent 50%), /* Brighter blue nebula highlight */
+    radial-gradient(ellipse at 40% 60%, hsla(260, 80%, 55%, 0.25) 0%, transparent 50%), /* Purple nebula highlight */
+    radial-gradient(ellipse at center, hsla(230, 70%, 15%, 0.7) 0%, hsla(260, 60%, 10%, 0.5) 40%, transparent 70%); /* Main darker nebula body */
+  background-size:
+    50px 50px,   /* Layer 1 stars pattern size */
+    150px 150px, /* Layer 2 stars pattern size */
+    80% 80%,     /* Nebula highlight 1 */
+    70% 70%,     /* Nebula highlight 2 */
+    100% 100%;   /* Main nebula body */
+  background-position:
+    0 0,         /* Layer 1 stars initial position */
+    25px 25px,   /* Layer 2 stars initial position (offset) */
+    center,      /* Nebula highlight 1 */
+    center,      /* Nebula highlight 2 */
+    center;      /* Main nebula body */
+  animation: moveStars 200s linear infinite;
+}
+
+@keyframes moveStars {
+  from {
+    background-position:
+      0 0,
+      25px 25px,
+      center,
+      center,
+      center;
+  }
+  to {
+    background-position:
+      -10000px 5000px,  /* Moves Layer 1 stars */
+      -10000px 5000px,  /* Moves Layer 2 stars (can be different for parallax) */
+      center,
+      center,
+      center;
+  }
+}
