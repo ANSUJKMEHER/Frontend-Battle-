@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { HighlightedKeyword } from "@/components/highlighted-keyword";
@@ -66,6 +66,11 @@ const ratings = [
 
 export default function HomePage() {
   const [settings, setSettings] = useState<Settings>(initialSettings);
+  const [currentYear, setCurrentYear] = useState<number | string>('');
+
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
 
   const processedTitle = useMemo(() =>
     renderTextWithHighlights(
@@ -125,9 +130,10 @@ export default function HomePage() {
         </main>
         
          <footer className="py-6 text-center text-xs text-slate-400/70 border-t border-slate-200/10 mt-auto z-10">
-          <p>&copy; {new Date().getFullYear()} AI Financial Tools Inc. All rights reserved.</p>
+          <p>&copy; {currentYear || new Date().getFullYear()} AI Financial Tools Inc. All rights reserved.</p>
         </footer>
       </div>
     </TooltipProvider>
   );
 }
+
