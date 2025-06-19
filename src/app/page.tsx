@@ -6,10 +6,11 @@ import Image from "next/image";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { HighlightedKeyword } from "@/components/highlighted-keyword";
 import { Button } from "@/components/ui/button";
-import { Star, Briefcase, TrendingUp, PieChart, BarChart2, Zap, Mail, ChevronUp } from "lucide-react";
+import { Star, Briefcase, TrendingUp, PieChart, BarChart2, Zap, Mail, ChevronUp, CheckCircle2, XCircle } from "lucide-react";
 import { AppLoader } from "@/components/loader";
 import { cn } from "@/lib/utils";
 import { ThemeToggleButton } from "@/components/theme-toggle-button";
+import { ComparisonChart } from "@/components/comparison-chart"; // New import
 
 export interface Settings {
   hoverDelay: number;
@@ -69,6 +70,7 @@ const navLinks = [
   { name: "Home", href: "#home" },
   { name: "Services", href: "#services" },
   { name: "Features", href: "#features" },
+  { name: "Why Us?", href: "#why-us" }, // New nav link
   { name: "Contact", href: "#contact" },
 ];
 
@@ -94,7 +96,7 @@ const AnimatedSection = ({ id, children, className }: { id: string, children: Re
     }
 
     return () => {
-      if (sectionRef.current) {
+      if (sectionRef.current && observer) {
         observer.unobserve(sectionRef.current);
       }
     };
@@ -118,14 +120,13 @@ const AnimatedSection = ({ id, children, className }: { id: string, children: Re
 
 export default function HomePage() {
   const [settings, setSettings] = useState<Settings>(initialSettings);
-  const [currentYear, setCurrentYear] = useState<number | string>('');
+  const [currentYear, setCurrentYear] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('home');
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  useEffect(() => {
-    const year = new Date().getFullYear();
-    setCurrentYear(year);
+ useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 2500); 
@@ -133,7 +134,7 @@ export default function HomePage() {
   }, []);
 
   const handleScroll = useCallback(() => {
-    const sections = ['home', 'services', 'features', 'contact'];
+    const sections = navLinks.map(link => link.href.substring(1)); // Use navLinks for sections
     const scrollPosition = window.scrollY + window.innerHeight / 2;
 
     for (const sectionId of sections) {
@@ -179,7 +180,7 @@ export default function HomePage() {
       ripple.style.top = `${e.clientY - rect.top - size / 2}px`;
       ripple.classList.add('ripple');
       link.appendChild(ripple);
-      setTimeout(() => ripple.remove(), 700); // Corresponds to animation duration in globals.css
+      setTimeout(() => ripple.remove(), 700);
     }
   };
   
@@ -192,8 +193,8 @@ export default function HomePage() {
   }
 
   return (
-    <TooltipProvider key={settings.hoverDelay} delayDuration={settings.hoverDelay}>
-      <div className="flex flex-col min-h-screen bg-gradient-to-br from-background via-background to-background text-foreground relative overflow-hidden"> {/* Updated background for theme provider */}
+    <TooltipProvider key={settings.hoverDelay.toString()} delayDuration={settings.hoverDelay}>
+      <div className="flex flex-col min-h-screen bg-gradient-to-br from-background via-background to-background text-foreground relative overflow-hidden">
         
         <Image src="https://placehold.co/400x300.png" alt="decorative background chart" data-ai-hint="financial chart" width={400} height={300} className="absolute top-1/4 left-[-50px] opacity-[0.07] blur-md transform -rotate-12 pointer-events-none" />
         <Image src="https://placehold.co/300x450.png" alt="decorative background report" data-ai-hint="data report" width={300} height={450} className="absolute top-10 right-[-80px] opacity-[0.07] blur-lg transform rotate-6 pointer-events-none" />
@@ -229,7 +230,7 @@ export default function HomePage() {
                 ))}
                  <ThemeToggleButton />
               </nav>
-               <div className="md:hidden"> {/* Mobile menu button with theme toggle */}
+               <div className="md:hidden flex items-center">
                 <ThemeToggleButton />
                 {/* Add mobile menu trigger here if needed */}
               </div>
@@ -279,7 +280,7 @@ export default function HomePage() {
         </div>
         
         <AnimatedSection id="services" className="bg-background/30 relative">
-            <div className="absolute inset-0 parallax-bg opacity-15" style={{backgroundImage: "url('https://placehold.co/1200x800.png?text=Parallax+Lines')"}} data-ai-hint='abstract lines'></div>
+            <div className="absolute inset-0 parallax-bg opacity-40" style={{backgroundImage: "url('https://placehold.co/1200x800.png?text=Parallax+Lines')"}} data-ai-hint='abstract lines'></div>
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
                 <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-primary">Our Services</h2>
                 <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
@@ -330,6 +331,16 @@ export default function HomePage() {
             </div>
         </AnimatedSection>
 
+        <AnimatedSection id="why-us" className="bg-background/30">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-primary">Why Choose Insightful?</h2>
+                <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
+                    See how our platform outperforms the competition and delivers tangible results for your business.
+                </p>
+                <ComparisonChart />
+            </div>
+        </AnimatedSection>
+
         <AnimatedSection id="contact" className="bg-background/30">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-primary">Get in Touch</h2>
@@ -343,7 +354,7 @@ export default function HomePage() {
         </AnimatedSection>
          
         <footer className="py-8 text-center text-sm text-muted-foreground border-t border-border mt-auto z-10">
-          <p>&copy; {currentYear || new Date().getFullYear()} AI Financial Tools Inc. All rights reserved.</p>
+          <p>&copy; {currentYear || new Date().getFullYear()} Insightful AI Tools Inc. All rights reserved.</p>
         </footer>
 
         {showScrollTop && (
@@ -359,3 +370,4 @@ export default function HomePage() {
     </TooltipProvider>
   );
 }
+
