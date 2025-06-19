@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Star, Briefcase, TrendingUp, PieChart, BarChart2, Zap, Mail, ChevronUp } from "lucide-react";
 import { AppLoader } from "@/components/loader";
 import { cn } from "@/lib/utils";
+import { ThemeToggleButton } from "@/components/theme-toggle-button";
 
 export interface Settings {
   hoverDelay: number;
@@ -163,8 +164,13 @@ export default function HomePage() {
     const targetElement = document.querySelector(href);
     if (targetElement) {
       targetElement.scrollIntoView({ behavior: 'smooth' });
-      // Add ripple effect
+      
       const link = e.currentTarget;
+      const existingRipple = link.querySelector('.ripple');
+      if (existingRipple) {
+        existingRipple.remove();
+      }
+
       const ripple = document.createElement('span');
       const rect = link.getBoundingClientRect();
       const size = Math.max(rect.width, rect.height);
@@ -173,7 +179,7 @@ export default function HomePage() {
       ripple.style.top = `${e.clientY - rect.top - size / 2}px`;
       ripple.classList.add('ripple');
       link.appendChild(ripple);
-      setTimeout(() => ripple.remove(), 600);
+      setTimeout(() => ripple.remove(), 700); // Corresponds to animation duration in globals.css
     }
   };
   
@@ -187,16 +193,16 @@ export default function HomePage() {
 
   return (
     <TooltipProvider key={settings.hoverDelay} delayDuration={settings.hoverDelay}>
-      <div className="flex flex-col min-h-screen bg-gradient-to-br from-[hsl(220,50%,10%)] via-[hsl(220,50%,15%)] to-[hsl(220,60%,20%)] text-foreground relative overflow-hidden">
+      <div className="flex flex-col min-h-screen bg-gradient-to-br from-background via-background to-background text-foreground relative overflow-hidden"> {/* Updated background for theme provider */}
         
-        <Image src="https://placehold.co/400x300.png" alt="decorative background chart" data-ai-hint="financial chart" width={400} height={300} className="absolute top-1/4 left-[-50px] opacity-10 blur-md transform -rotate-12 pointer-events-none" />
-        <Image src="https://placehold.co/300x450.png" alt="decorative background report" data-ai-hint="data report" width={300} height={450} className="absolute top-10 right-[-80px] opacity-10 blur-lg transform rotate-6 pointer-events-none" />
-        <div className="absolute top-1/3 left-1/4 w-32 h-32 bg-sky-500/20 rounded-full blur-2xl opacity-50 animate-pulse pointer-events-none" data-ai-hint="abstract circle"></div>
-        <div className="absolute bottom-1/4 right-1/3 w-24 h-24 bg-purple-500/20 rounded-full blur-xl opacity-50 animate-pulse delay-500 pointer-events-none" data-ai-hint="gradient orb"></div>
-        <div className="absolute top-20 left-1/2 w-60 h-60 bg-teal-500/10 rounded-full blur-3xl opacity-30 animate-ping-slow pointer-events-none" data-ai-hint="dotted pattern"></div>
-        <div className="absolute bottom-10 right-10 w-40 h-40 bg-pink-500/10 rounded-2xl blur-2xl opacity-40 transform rotate-45 animate-pulse-slow pointer-events-none" data-ai-hint="soft glow"></div>
+        <Image src="https://placehold.co/400x300.png" alt="decorative background chart" data-ai-hint="financial chart" width={400} height={300} className="absolute top-1/4 left-[-50px] opacity-[0.07] blur-md transform -rotate-12 pointer-events-none" />
+        <Image src="https://placehold.co/300x450.png" alt="decorative background report" data-ai-hint="data report" width={300} height={450} className="absolute top-10 right-[-80px] opacity-[0.07] blur-lg transform rotate-6 pointer-events-none" />
+        <div className="absolute top-1/3 left-1/4 w-32 h-32 bg-primary/10 rounded-full blur-2xl opacity-30 animate-pulse pointer-events-none" data-ai-hint="abstract circle"></div>
+        <div className="absolute bottom-1/4 right-1/3 w-24 h-24 bg-accent/10 rounded-full blur-xl opacity-30 animate-pulse delay-500 pointer-events-none" data-ai-hint="gradient orb"></div>
+        <div className="absolute top-20 left-1/2 w-60 h-60 bg-secondary/5 rounded-full blur-3xl opacity-20 animate-ping-slow pointer-events-none" data-ai-hint="dotted pattern"></div>
+        <div className="absolute bottom-10 right-10 w-40 h-40 bg-primary/5 rounded-2xl blur-2xl opacity-25 transform rotate-45 animate-pulse-slow pointer-events-none" data-ai-hint="soft glow"></div>
 
-        <header className="fixed top-0 left-0 right-0 z-50 bg-[hsl(220,50%,12%)]/80 backdrop-blur-md shadow-lg">
+        <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md shadow-lg">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center">
@@ -204,7 +210,7 @@ export default function HomePage() {
                   Insightful
                 </a>
               </div>
-              <nav className="hidden md:flex space-x-4">
+              <nav className="hidden md:flex items-center space-x-1">
                 {navLinks.map((link) => (
                   <a
                     key={link.name}
@@ -214,36 +220,40 @@ export default function HomePage() {
                       "px-3 py-2 rounded-md text-sm font-medium relative overflow-hidden",
                       activeSection === link.href.substring(1)
                         ? "text-primary bg-primary/10"
-                        : "text-slate-300 hover:text-white hover:bg-white/5",
+                        : "text-foreground/70 hover:text-foreground hover:bg-foreground/5",
                       "transition-colors duration-150"
                     )}
                   >
                     {link.name}
                   </a>
                 ))}
+                 <ThemeToggleButton />
               </nav>
-              {/* Mobile menu button could be added here */}
+               <div className="md:hidden"> {/* Mobile menu button with theme toggle */}
+                <ThemeToggleButton />
+                {/* Add mobile menu trigger here if needed */}
+              </div>
             </div>
           </div>
         </header>
         
-        <div id="home" className="pt-16"> {/* Add padding-top to offset fixed header */}
+        <div id="home" className="pt-16"> 
           <div className="w-full py-5 px-4 sm:px-8 md:px-16 z-10">
-            <div className="container mx-auto flex flex-wrap justify-center items-center gap-x-6 lg:gap-x-10 gap-y-2 text-sm text-slate-300 mt-8">
+            <div className="container mx-auto flex flex-wrap justify-center items-center gap-x-6 lg:gap-x-10 gap-y-2 text-sm text-foreground/80 mt-8">
               {ratings.map((item, index) => (
                 <div key={index} className="flex items-center space-x-1.5">
                   {item.icon}
-                  <span><strong>{item.rating}</strong> {item.reviews} <span className="font-semibold text-slate-100">{item.name}</span></span>
+                  <span><strong>{item.rating}</strong> {item.reviews} <span className="font-semibold text-foreground/90">{item.name}</span></span>
                 </div>
               ))}
             </div>
           </div>
 
-          <main className="flex-grow flex flex-col items-center justify-center text-center px-4 py-10 sm:py-16 z-10 min-h-[calc(100vh-4rem-5rem)]"> {/* Adjust min-height for header and ratings */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">
+          <main className="flex-grow flex flex-col items-center justify-center text-center px-4 py-10 sm:py-16 z-10 min-h-[calc(100vh-4rem-5rem)]">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground/80 to-foreground/60">
               {processedTitle}
             </h1>
-            <p className="text-xl sm:text-2xl mb-10 text-slate-200 flex items-center">
+            <p className="text-xl sm:text-2xl mb-10 text-foreground/80 flex items-center">
               <span role="img" aria-label="sparkles" className="mr-2 text-2xl">✨</span>
               Now with AI-insights
             </p>
@@ -268,11 +278,11 @@ export default function HomePage() {
           </main>
         </div>
         
-        <AnimatedSection id="services" className="bg-gradient-to-b from-transparent to-[hsl(220,50%,18%)]/30 relative">
-            <div className="absolute inset-0 bg-[url('https://placehold.co/1200x800/1A202C/3A404C.png&text=Abstract+Lines')] bg-cover bg-fixed opacity-5 data-ai-hint='abstract lines'"></div>
+        <AnimatedSection id="services" className="bg-background/30 relative">
+            <div className="absolute inset-0 parallax-bg opacity-15" style={{backgroundImage: "url('https://placehold.co/1200x800.png?text=Parallax+Lines')"}} data-ai-hint='abstract lines'></div>
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
                 <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-primary">Our Services</h2>
-                <p className="text-lg text-slate-300 mb-12 max-w-2xl mx-auto">
+                <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
                     We offer a comprehensive suite of AI-powered financial tools to streamline your business operations.
                 </p>
                 <div className="grid md:grid-cols-3 gap-8">
@@ -285,7 +295,7 @@ export default function HomePage() {
                             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center" data-ai-hint={service.dataAiHint}>
                                {service.icon}
                             </div>
-                            <h3 className="text-xl font-semibold mb-2 text-foreground">{service.title}</h3>
+                            <h3 className="text-xl font-semibold mb-2 text-card-foreground">{service.title}</h3>
                             <p className="text-muted-foreground text-sm">{service.desc}</p>
                         </div>
                     ))}
@@ -296,7 +306,7 @@ export default function HomePage() {
         <AnimatedSection id="features">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-primary">Key Features</h2>
-                <p className="text-lg text-slate-300 mb-12 max-w-2xl mx-auto">
+                <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
                     Discover the powerful features that make our platform stand out.
                 </p>
                 <div className="grid md:grid-cols-2 gap-8">
@@ -311,7 +321,7 @@ export default function HomePage() {
                                 {feature.icon}
                             </div>
                             <div>
-                                <h3 className="text-xl font-semibold mb-1 text-foreground text-left">{feature.title}</h3>
+                                <h3 className="text-xl font-semibold mb-1 text-card-foreground text-left">{feature.title}</h3>
                                 <p className="text-muted-foreground text-sm text-left">{feature.desc}</p>
                             </div>
                         </div>
@@ -320,10 +330,10 @@ export default function HomePage() {
             </div>
         </AnimatedSection>
 
-        <AnimatedSection id="contact" className="bg-gradient-to-t from-transparent to-[hsl(220,50%,18%)]/30">
+        <AnimatedSection id="contact" className="bg-background/30">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-primary">Get in Touch</h2>
-                <p className="text-lg text-slate-300 mb-10 max-w-xl mx-auto">
+                <p className="text-lg text-muted-foreground mb-10 max-w-xl mx-auto">
                     Have questions or want to learn more? Reach out to us!
                 </p>
                 <Button size="lg" className="px-10 py-4 text-lg font-semibold rounded-lg bg-accent text-accent-foreground hover:bg-accent/90 shadow-lg transform transition-transform hover:scale-105">
@@ -332,7 +342,7 @@ export default function HomePage() {
             </div>
         </AnimatedSection>
          
-        <footer className="py-8 text-center text-sm text-slate-400/70 border-t border-slate-200/10 mt-auto z-10">
+        <footer className="py-8 text-center text-sm text-muted-foreground border-t border-border mt-auto z-10">
           <p>&copy; {currentYear || new Date().getFullYear()} AI Financial Tools Inc. All rights reserved.</p>
         </footer>
 

@@ -9,7 +9,7 @@ body {
 
 @layer base {
   :root {
-    /* Light theme (will not be default, but kept for completeness) */
+    /* Light theme */
     --background: 210 27% 95%; 
     --foreground: 210 10% 23%;
 
@@ -114,15 +114,15 @@ body {
 .ripple {
   position: absolute;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.3); /* Light ripple on dark background */
+  background-color: hsla(var(--primary) / 0.5); /* More visible ripple */
   transform: scale(0);
-  animation: ripple-animation 0.6s linear;
+  animation: ripple-animation 0.7s linear; /* Slightly longer duration */
   pointer-events: none; /* Ensure ripple doesn't interfere with clicks */
 }
 
 @keyframes ripple-animation {
   to {
-    transform: scale(4);
+    transform: scale(5); /* Larger scale */
     opacity: 0;
   }
 }
